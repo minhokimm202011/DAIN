@@ -232,7 +232,7 @@ Original Notebook File by btahir can be found [here](https://github.com/baowenbo
 
 To use the Colab, follow these steps:
 
-- Download the `Colab_DAIN.ipynb` file ([link](https://raw.githubusercontent.com/baowenbo/DAIN/master/Colab_DAIN.ipynb)).
+- Download the `Colab_DAIN.ipynb` file ([link](https://raw.githubusercontent.com/baowenbo/DAIN/master/Colab/Colab_DAIN.ipynb)).
 - Visit Google Colaboratory ([link](https://colab.research.google.com/))
 - Select the "Upload" option, and upload the `.ipynb` file
 - Start running the cells one by one, following the instructions.
