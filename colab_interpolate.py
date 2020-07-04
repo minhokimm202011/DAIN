@@ -112,16 +112,7 @@ while input_frame < final_frame - 1:
     y_s, offset, filter = model(torch.stack((X0, X1),dim = 0))
     y_ = y_s[args.save_which]
 
-    if args.use_cuda:
-        X0 = X0.data.cpu().numpy()
-        if not isinstance(y_, list):
-            y_ = y_.data.cpu().numpy()
-        else:
-            y_ = [item.data.cpu().numpy() for item in y_]
-        offset = [offset_i.data.cpu().numpy() for offset_i in offset]
-        filter = [filter_i.data.cpu().numpy() for filter_i in filter]  if filter[0] is not None else None
-        X1 = X1.data.cpu().numpy()
-    else:
+    if not args.use_cuda:
         X0 = X0.data.numpy()
         if not isinstance(y_, list):
             y_ = y_.data.numpy()
@@ -131,21 +122,29 @@ while input_frame < final_frame - 1:
         filter = [filter_i.data.numpy() for filter_i in filter]
         X1 = X1.data.numpy()
 
-    X0 = np.transpose(255.0 * X0.clip(0,1.0)[0, :, intPaddingTop:intPaddingTop+intHeight, intPaddingLeft: intPaddingLeft+intWidth], (1, 2, 0))
-    y_ = [np.transpose(255.0 * item.clip(0,1.0)[0, :, intPaddingTop:intPaddingTop+intHeight,
-                                intPaddingLeft:intPaddingLeft+intWidth], (1, 2, 0)) for item in y_]
-    offset = [np.transpose(offset_i[0, :, intPaddingTop:intPaddingTop+intHeight, intPaddingLeft: intPaddingLeft+intWidth], (1, 2, 0)) for offset_i in offset]
-    filter = [np.transpose(
-        filter_i[0, :, intPaddingTop:intPaddingTop + intHeight, intPaddingLeft: intPaddingLeft + intWidth],
-        (1, 2, 0)) for filter_i in filter]  if filter is not None else None
-    X1 = np.transpose(255.0 * X1.clip(0,1.0)[0, :, intPaddingTop:intPaddingTop+intHeight, intPaddingLeft: intPaddingLeft+intWidth], (1, 2, 0))
+    def pad_transpose(tensor):
+        padded_tensor = tensor[0,
+                               :,
+                               intPaddingTop:intPaddingTop + intHeight,
+                               intPaddingLeft:intPaddingLeft + intWidth]
+        return padded_tensor.permute(1, 2, 0)
+
+    def normalize_pad_transpose(tensor):
+        normalized_tensor = 255.0 * tensor.clamp(0, 1.0)
+        return pad_transpose(tensor)
+
+    X0 = normalize_pad_transpose(X0)
+    y_ = [normalize_pad_transpose(item) for item in y_]
+    offset = [pad_transpose(offset_i) for offset_i in offset]
+    filter = [pad_transpose(filter_i) for filter_i in filter] if filter is not None else None
+    X1 = normalize_pad_transpose(X1)
 
     interpolated_frame_number = 0
     shutil.copy(filename_frame_1, os.path.join(output_dir, f"{input_frame:0>5d}{interpolated_frame_number:0>3d}.png"))
     for item, time_offset in zip(y_, time_offsets):
         interpolated_frame_number += 1
         output_frame_file_path = os.path.join(output_dir, f"{input_frame:0>5d}{interpolated_frame_number:0>3d}.png")
-        imsave(output_frame_file_path, np.round(item).astype(numpy.uint8))
+        imsave(output_frame_file_path, np.round(item.cpu().numpy()).astype(numpy.uint8))
 
     end_time = time.time()
     loop_timer.update(end_time - start_time)
