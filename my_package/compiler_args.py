@@ -5,7 +5,8 @@ nvcc_args = [
     # NVIDIA NVS: (None)
     # Jetson: (None)
     '-gencode', 'arch=compute_30,code=sm_30',
-    '-gencode', 'arch=compute_37,code=sm_37',
+    '-gencode', 'arch=compute_35,code=sm_35',
+    #'-gencode', 'arch=compute_37,code=sm_37',
 
     # Tesla: (None)
     # Quadro: K1200, K620, M1200, M520, M5000M, M4000M, M3000M, M2000M, M1000M, K620M, M600M, M500M
@@ -40,10 +41,10 @@ nvcc_args = [
     # NVIDIA NVS: (None)
     # GeForce / Titan: TITAN RTX, RTX 2080 Ti, RTX 2080, RTX 2070, RTX 2060, RTX 2080, RTX 2070, RTX 2060
     # Jetson: (None)
-    '-gencode', 'arch=compute_75,code=sm_75',
+    #'-gencode', 'arch=compute_75,code=sm_75',
 
-    '-gencode', 'arch=compute_70,code=sm_70',
-    '-gencode', 'arch=compute_70,code=compute_70'
+    #'-gencode', 'arch=compute_70,code=sm_70',
+    #'-gencode', 'arch=compute_70,code=compute_70'
     '-w' # Ignore compiler warnings.
 ]
 
